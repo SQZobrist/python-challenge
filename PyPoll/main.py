@@ -4,46 +4,59 @@ import sys
 
 
 totalV = 0
-candidates = []
+candidates = {}
+candNames = []
 winner = ["", 0, 0]
-
+voteSet = []
 csvpath = os.path.join('.', 'Resources', 'election_data.csv')
+percent = 0
 
 with open(csvpath, newline="") as csvfile:
     csvreader = csv.reader(csvfile, delimiter=",")
     csv_header = next(csvreader)
     
     for data in csvreader:
-        totalV += 1
-        
-        testC = 0
-        
-        for cand in candidates:
-            if cand == data[2]:
-                testC += 1
-                cand[1] += 1
-                
-        if testC == 0:
-            candidates.append([data[2], 1, 0])
+        voteSet.append(data[2])
+        candidates[data[2]] = 1
     
-    
-    print("Results: Total Votes: ", totalV, "  ")    
-    
-    for cand in candidates:
-        cand[2] = (cand[1] / totalV) * 100
-        print(cand[0], ": ", cand[2], "% (", cand[1], ")  " )
-        if winner[1] < cand[1]:
-            winner = cand
+for votes in voteSet:
+    candidates[votes] += 1
             
-    print("  And the winner is: ", winner[0])
     
- with open('Output.txt', newline="") as csvfile:
+    
+totalV = len(voteSet)
+
+print("Results: Total Votes: ", totalV, "  ") 
+
+candNames = list(candidates.keys())
+for cand in candNames:
+    
+    percent = round(((candidates[cand] / totalV) * 100), 4)
+    
+    print(cand, ": ", percent, "% (", candidates[cand], ")  " )
+    
+    if winner[1] < candidates[cand]:
+        winner[1] = candidates[cand]
+        winner[2] = percent
+        winner[0] = cand
+            
+print("  And the winner is: ", winner[0])
+
+with open('Output.txt', newline="") as csvfile:
     sys.stdout = open('Output.txt', 'w')
+
     print("Results: Total Votes: ", totalV, "  ") 
-    for cand in candidates:
-        cand[2] = (cand[1] / totalV) * 100
-        print(cand[0], ": ", cand[2], "% (", cand[1], ")  " )
-        if winner[1] < cand[1]:
-            winner = cand
+
+    candNames = list(candidates.keys())
+    for cand in candNames:
+    
+        percent = round(((candidates[cand] / totalV) * 100), 4)
+    
+        print(cand, ": ", percent, "% (", candidates[cand], ")  " )
+    
+        if winner[1] < candidates[cand]:
+            winner[1] = candidates[cand]
+            winner[2] = percent
+            winner[0] = cand
             
-    print("  And the winner is: ", winner[0])
+     print("  And the winner is: ", winner[0])
